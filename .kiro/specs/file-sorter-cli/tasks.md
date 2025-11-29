@@ -1,18 +1,30 @@
 # Implementation Plan
 
-- [ ] 1. Set up project structure and dependencies
+- [x] 1. Set up project structure and dependencies
+
+
+
+
+
   - Create Python package structure with modules: cli, classifier, sorter, scanner, cleaner, main
   - Set up pyproject.toml with dependencies: rich, pytest, hypothesis
   - Create entry point script for `sik` command
   - _Requirements: 8.1, 8.2, 8.3_
 
-- [ ] 2. Implement file classifier module
+- [x] 2. Implement file classifier module
+
+
+
+
+
   - Create FileCategory enum with values (IMAGE="img", VIDEO="vid", ARCHIVE="arc", MISC="msk")
   - Define extension mappings for each category
   - Implement classify_file() function with case-insensitive extension matching
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 2.1 Write property test for case-insensitive classification
+- [x] 2.1 Write property test for case-insensitive classification
+
+
   - **Property 13: Case-insensitive classification**
   - **Validates: Requirements 6.1, 6.2, 6.3, 6.4**
 

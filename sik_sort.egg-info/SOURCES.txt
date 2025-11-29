@@ -1,0 +1,15 @@
+README.md
+pyproject.toml
+sik_sort/__init__.py
+sik_sort/classifier.py
+sik_sort/cleaner.py
+sik_sort/cli.py
+sik_sort/main.py
+sik_sort/scanner.py
+sik_sort/sorter.py
+sik_sort.egg-info/PKG-INFO
+sik_sort.egg-info/SOURCES.txt
+sik_sort.egg-info/dependency_links.txt
+sik_sort.egg-info/entry_points.txt
+sik_sort.egg-info/requires.txt
+sik_sort.egg-info/top_level.txt

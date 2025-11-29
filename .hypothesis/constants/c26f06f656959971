@@ -1,0 +1,4 @@
+# file: C:\Users\ryanf\github\sik-sort\sik_sort\classifier.py
+# hypothesis_version: 6.148.2
+
+['.7z', '.avi', '.bmp', '.bz2', '.flv', '.gif', '.gz', '.iso', '.jpeg', '.jpg', '.m4v', '.mkv', '.mov', '.mp4', '.mpeg', '.mpg', '.png', '.rar', '.svg', '.tar', '.tiff', '.webm', '.webp', '.wmv', '.xz', '.zip', 'arc', 'img', 'msk', 'vid']
