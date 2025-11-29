@@ -28,50 +28,79 @@
   - **Property 13: Case-insensitive classification**
   - **Validates: Requirements 6.1, 6.2, 6.3, 6.4**
 
-- [ ] 3. Implement directory scanner module
+- [x] 3. Implement directory scanner module
+
+
+
+
+
   - Create scan_directory() function to recursively traverse directories
   - Implement logic to skip category folders (img, vid, arc, msk) during scanning
   - Return list of all file paths found
   - _Requirements: 3.1_
 
-- [ ] 3.1 Write property test for recursive traversal
+- [x] 3.1 Write property test for recursive traversal
+
+
   - **Property 8: Recursive traversal finds all files**
   - **Validates: Requirements 3.1**
 
-- [ ] 4. Implement file sorter module with conflict resolution
+- [x] 4. Implement file sorter module with conflict resolution
+
+
+
+
+
   - Create SortingStats dataclass to track file counts
   - Implement move_file_with_conflict_resolution() to handle naming conflicts
   - Implement generate_unique_filename() to create unique names (filename_1.ext, filename_2.ext, etc.)
   - Implement sort_files() orchestrator function
   - _Requirements: 2.2, 2.3, 2.4, 2.5, 3.3, 7.1, 7.2, 7.3_
 
-- [ ] 4.1 Write property test for filename preservation
+- [x] 4.1 Write property test for filename preservation
+
+
   - **Property 9: Filename preservation**
   - **Validates: Requirements 3.3**
 
-- [ ] 4.2 Write property test for no file overwriting
+- [x] 4.2 Write property test for no file overwriting
+
+
   - **Property 14: No file overwriting**
   - **Validates: Requirements 7.1**
 
-- [ ] 4.3 Write property test for conflict resolution preserves extensions
+- [x] 4.3 Write property test for conflict resolution preserves extensions
+
+
   - **Property 15: Conflict resolution preserves extensions**
   - **Validates: Requirements 7.2**
 
-- [ ] 4.4 Write property test for unique names for all conflicts
+- [x] 4.4 Write property test for unique names for all conflicts
+
+
   - **Property 16: Unique names for all conflicts**
   - **Validates: Requirements 7.3**
 
-- [ ] 5. Implement folder cleaner module
+- [x] 5. Implement folder cleaner module
+
+
+
+
+
   - Create find_empty_directories() to identify empty folders
   - Implement logic to preserve category folders (img, vid, arc, msk)
   - Create remove_empty_directories() to delete empty folders
   - _Requirements: 5.2, 5.4_
 
-- [ ] 5.1 Write property test for empty directory removal
+- [x] 5.1 Write property test for empty directory removal
+
+
   - **Property 11: Empty directories are removed**
   - **Validates: Requirements 5.2**
 
-- [ ] 6. Implement CLI module with Rich library
+- [-] 6. Implement CLI module with Rich library
+
+
   - Create prompt_for_path() with validation and error handling
   - Implement display_statistics() using Rich tables
   - Create confirm_cleanup() for yes/no prompts

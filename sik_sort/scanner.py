@@ -13,7 +13,22 @@ def scan_directory(path: Path, exclude_dirs: set[str]) -> list[Path]:
     Returns:
         list[Path]: List of file paths found
     """
-    pass
+    files = []
+    
+    for item in path.rglob('*'):
+        # Skip if any parent directory is excluded
+        if any(is_excluded_directory(parent, exclude_dirs) for parent in item.parents):
+            continue
+        
+        # Skip if the item itself is an excluded directory
+        if item.is_dir() and is_excluded_directory(item, exclude_dirs):
+            continue
+            
+        # Add files only
+        if item.is_file():
+            files.append(item)
+    
+    return files
 
 
 def is_excluded_directory(path: Path, exclude_dirs: set[str]) -> bool:
@@ -26,4 +41,4 @@ def is_excluded_directory(path: Path, exclude_dirs: set[str]) -> bool:
     Returns:
         bool: True if directory should be excluded, False otherwise
     """
-    pass
+    return path.name in exclude_dirs
