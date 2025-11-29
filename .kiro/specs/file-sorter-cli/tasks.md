@@ -98,7 +98,10 @@
   - **Property 11: Empty directories are removed**
   - **Validates: Requirements 5.2**
 
-- [-] 6. Implement CLI module with Rich library
+- [x] 6. Implement CLI module with Rich library
+
+
+
 
 
   - Create prompt_for_path() with validation and error handling
@@ -108,11 +111,15 @@
   - Create display_error() with Rich error styling
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 4.3, 5.1, 8.1, 8.2, 8.3_
 
-- [ ] 6.1 Write property test for valid paths acceptance
+- [x] 6.1 Write property test for valid paths acceptance
+
+
   - **Property 1: Valid paths are accepted**
   - **Validates: Requirements 1.2**
 
-- [ ] 6.2 Write property test for invalid paths rejection
+- [x] 6.2 Write property test for invalid paths rejection
+
+
   - **Property 2: Invalid paths are rejected**
   - **Validates: Requirements 1.3**
 

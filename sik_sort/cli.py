@@ -16,7 +16,19 @@ def prompt_for_path() -> Path:
     Returns:
         Path: Validated directory path
     """
-    pass
+    while True:
+        path_str = Prompt.ask("[bold cyan]Enter the source directory path[/bold cyan]")
+        path = Path(path_str)
+        
+        if not path.exists():
+            display_error(f"Path does not exist: {path_str}")
+            continue
+        
+        if not path.is_dir():
+            display_error(f"Path is not a directory: {path_str}")
+            continue
+        
+        return path
 
 
 def display_statistics(stats) -> None:
@@ -25,7 +37,19 @@ def display_statistics(stats) -> None:
     Args:
         stats: SortingStats object containing file counts
     """
-    pass
+    table = Table(title="Sorting Statistics", show_header=True, header_style="bold magenta")
+    table.add_column("Category", style="cyan", justify="left")
+    table.add_column("Count", style="green", justify="right")
+    
+    table.add_row("Images (img)", str(stats.img_count))
+    table.add_row("Videos (vid)", str(stats.vid_count))
+    table.add_row("Archives (arc)", str(stats.arc_count))
+    table.add_row("Miscellaneous (msk)", str(stats.msk_count))
+    table.add_row("[bold]Total[/bold]", f"[bold]{stats.total_files}[/bold]")
+    
+    console.print()
+    console.print(table)
+    console.print()
 
 
 def confirm_cleanup() -> bool:
@@ -34,7 +58,7 @@ def confirm_cleanup() -> bool:
     Returns:
         bool: True if user confirms cleanup, False otherwise
     """
-    pass
+    return Confirm.ask("[bold yellow]Do you want to clean up empty folders?[/bold yellow]")
 
 
 def show_progress(total: int) -> Progress:
@@ -46,7 +70,14 @@ def show_progress(total: int) -> Progress:
     Returns:
         Progress: Rich progress bar instance
     """
-    pass
+    progress = Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        console=console
+    )
+    return progress
 
 
 def display_error(message: str) -> None:
@@ -55,4 +86,4 @@ def display_error(message: str) -> None:
     Args:
         message: Error message to display
     """
-    pass
+    console.print(f"[bold red]Error:[/bold red] {message}")
