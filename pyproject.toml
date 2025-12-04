@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "sik-sort"
@@ -26,8 +26,8 @@ classifiers = [
     "Topic :: Utilities",
 ]
 dependencies = [
-    "rich>=13.0.0,<14.0.0",
-    "pyyaml>=6.0.0,<7.0.0",
+    "rich>=13.0.0",
+    "pyyaml>=6.0.0",
 ]
 
 [project.optional-dependencies]
@@ -39,12 +39,17 @@ dev = [
 [project.scripts]
 sik = "sik_sort.main:main"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["sik_sort*"]
+[tool.hatch.build.targets.wheel]
+packages = ["sik_sort"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+    "hypothesis>=6.0.0",
+]

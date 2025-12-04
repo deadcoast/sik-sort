@@ -1,6 +1,25 @@
 # Sik Sort
 
+[![Tests](https://github.com/YOUR_USERNAME/sik-sort/workflows/Tests/badge.svg)](https://github.com/YOUR_USERNAME/sik-sort/actions)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![UV](https://img.shields.io/badge/package%20manager-UV-orange.svg)](https://docs.astral.sh/uv/)
+
 A command-line utility for Windows that organizes files from a specified directory into categorized folders based on file type. Sik Sort recursively processes all files and subdirectories, intelligently categorizing and moving files while handling conflicts gracefully.
+
+## Quick Start
+
+```bash
+# Install UV (if not already installed)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Clone and install Sik Sort
+git clone <repository-url>
+cd sik-sort
+uv pip install -e .
+
+# Run Sik Sort
+sik sort C:\Users\YourName\Downloads
+```
 
 ## Features
 
@@ -26,29 +45,95 @@ A command-line utility for Windows that organizes files from a specified directo
 ### Prerequisites
 
 - Python 3.8 or higher
-- pip (Python package installer)
+- [UV](https://docs.astral.sh/uv/) (recommended) or pip
+
+### Installing UV
+
+UV is a fast Python package manager that's significantly faster than pip. Install it using one of these methods:
+
+**Windows (PowerShell):**
+```powershell
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+**macOS/Linux:**
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**With pip:**
+```bash
+pip install uv
+```
+
+For more installation options, see the [UV documentation](https://docs.astral.sh/uv/getting-started/installation/).
 
 ### Install from Source
 
+#### Using UV (Recommended)
+
+UV can automatically manage virtual environments for you, making installation even simpler.
+
+**Option 1: Quick Install (UV manages everything)**
+
 1. Clone or download this repository
 2. Navigate to the project directory
-3. Install the package:
+3. Install and run:
 
 ```bash
-pip install -e .
+# UV automatically creates a virtual environment and installs dependencies
+uv pip install -e .
+
+# Or run directly without explicit installation
+uv run sik sort C:\Users\YourName\Downloads
 ```
 
-This installs Sik Sort in "editable" mode, making the `sik` command available system-wide.
+**Option 2: Manual Virtual Environment**
+
+```bash
+# Create a virtual environment
+uv venv
+
+# Activate it (Windows)
+.venv\Scripts\activate
+
+# Install the package
+uv pip install -e .
+```
+
+This installs Sik Sort in "editable" mode, making the `sik` command available.
+
+#### Using pip
+
+If you prefer to use pip:
+
+```bash
+# Create and activate a virtual environment
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+source .venv/bin/activate  # macOS/Linux
+
+# Install the package
+pip install -e .
+```
 
 ### Install with Development Dependencies
 
 If you want to run tests or contribute to development:
 
+**With UV:**
+```bash
+uv pip install -e ".[dev]"
+```
+
+**With pip:**
 ```bash
 pip install -e ".[dev]"
 ```
 
 This includes pytest and hypothesis for testing.
+
+> **Note**: UV automatically creates a `uv.lock` file that locks all dependency versions for reproducible installations. This file should be committed to version control to ensure all developers and CI systems use the same dependency versions.
 
 ### Verify Installation
 
@@ -319,11 +404,35 @@ You can bypass safety checks with the `--force` flag, but this is not recommende
 
 ## Development
 
+For detailed information about contributing to Sik Sort, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Quick Development Setup
+
+**With UV:**
+```bash
+git clone <repository-url>
+cd sik-sort
+uv venv
+.venv\Scripts\activate  # Windows
+uv pip install -e ".[dev]"
+uv run pytest
+```
+
+**With pip:**
+```bash
+git clone <repository-url>
+cd sik-sort
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+pip install -e ".[dev]"
+pytest
+```
+
 ### Project Structure
 
 ```
 sik-sort/
-├── src/
+├── sik_sort/
 │   ├── __init__.py
 │   ├── cli.py              # CLI interaction with Rich library
 │   ├── classifier.py       # File type classification
@@ -332,30 +441,52 @@ sik-sort/
 │   ├── cleaner.py          # Empty folder cleanup
 │   ├── safety.py           # Safety checks
 │   ├── operation_logger.py # Operation logging
+│   ├── config.py           # Configuration management
+│   ├── date_classifier.py  # Date-based classification
+│   ├── size_classifier.py  # Size-based classification
+│   ├── duplicates.py       # Duplicate file detection
+│   ├── filters.py          # File filtering
 │   └── main.py             # Application entry point
 ├── tests/
 │   ├── test_*_properties.py # Property-based tests
 │   └── __init__.py
 ├── pyproject.toml          # Project configuration
+├── uv.lock                 # UV lock file
 └── README.md               # This file
 ```
 
 ### Running Tests
 
-Run all tests:
+**With UV (Recommended):**
 
+Run all tests:
+```bash
+uv run pytest
+```
+
+Run with verbose output:
+```bash
+uv run pytest -v
+```
+
+Run specific test file:
+```bash
+uv run pytest tests/test_classifier_properties.py
+```
+
+**With pytest directly:**
+
+If you've already installed dependencies:
 ```bash
 pytest
 ```
 
 Run with verbose output:
-
 ```bash
 pytest -v
 ```
 
 Run specific test file:
-
 ```bash
 pytest tests/test_classifier_properties.py
 ```
@@ -375,6 +506,12 @@ Each property test runs a minimum of 100 iterations to ensure thorough coverage.
 
 If `sik` command is not found after installation:
 
+**With UV:**
+1. Ensure UV's script directory is in your PATH
+2. Try reinstalling: `uv pip uninstall sik-sort && uv pip install -e .`
+3. Alternatively, run directly: `uv run sik`
+
+**With pip:**
 1. Ensure pip's script directory is in your PATH
 2. Try reinstalling: `pip uninstall sik-sort && pip install -e .`
 3. Use the full path to the script (usually in `Scripts` folder of your Python installation)
@@ -431,7 +568,36 @@ MIT License - See LICENSE file for details
 
 Sik Sort Team
 
+## Why UV?
+
+UV is a modern Python package manager that offers several advantages:
+
+- **Speed**: 10-100x faster than pip for package installation
+  - Installing Sik Sort with dependencies: ~1-2 seconds with UV vs ~10-30 seconds with pip
+  - Running tests with `uv run pytest`: Instant startup vs slower with traditional venv
+- **Reliability**: Built-in dependency resolution and lock files (`uv.lock`)
+  - Ensures consistent installations across different machines
+  - Prevents dependency conflicts before installation
+- **Compatibility**: Drop-in replacement for pip commands
+  - `uv pip install` works exactly like `pip install`
+  - No need to learn new commands
+- **Modern**: Written in Rust with a focus on performance
+  - Parallel downloads and installations
+  - Efficient caching
+
+### UV vs pip Comparison
+
+| Task | UV | pip |
+|------|-----|-----|
+| Install dependencies | `uv pip install -e .` | `pip install -e .` |
+| Install with dev deps | `uv pip install -e ".[dev]"` | `pip install -e ".[dev]"` |
+| Run command | `uv run pytest` | `pytest` |
+| Create venv | `uv venv` | `python -m venv .venv` |
+
+While pip still works perfectly fine, UV provides a significantly better developer experience, especially for projects with many dependencies or when running tests frequently.
+
 ## Acknowledgments
 
 - Built with [Rich](https://github.com/Textualize/rich) for beautiful terminal output
 - Tested with [Hypothesis](https://hypothesis.readthedocs.io/) for property-based testing
+- Package management with [UV](https://docs.astral.sh/uv/) for fast, reliable installs
