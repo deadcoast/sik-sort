@@ -337,7 +337,10 @@
   - **Property 29: Dry-run skips cleanup prompt**
   - **Validates: Requirements 11.5**
 
-- [-] 14. Implement command-line argument parsing
+- [x] 14. Implement command-line argument parsing
+
+
+
 
 
 
@@ -353,19 +356,24 @@
   - Fall back to interactive prompt if no path provided
   - _Requirements: 12.1, 12.2, 12.3, 12.4_
 
-- [ ] 14.1 Write property test for command-line path is used
+- [x] 14.1 Write property test for command-line path is used
+
+
   - **Property 30: Command-line path argument is used**
   - **Validates: Requirements 12.1**
 
-- [ ] 14.2 Write property test for missing path triggers prompt
+- [x] 14.2 Write property test for missing path triggers prompt
+
   - **Property 31: Missing path triggers interactive prompt**
   - **Validates: Requirements 12.2**
 
-- [ ] 14.3 Write property test for dry-run with path argument
+- [x] 14.3 Write property test for dry-run with path argument
+
   - **Property 32: Dry-run flag works with path argument**
   - **Validates: Requirements 12.3**
 
-- [ ] 14.4 Write property test for invalid command-line path error
+- [x] 14.4 Write property test for invalid command-line path error
+
   - **Property 33: Invalid command-line path shows error**
   - **Validates: Requirements 12.4**
 

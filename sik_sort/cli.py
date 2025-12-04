@@ -1,13 +1,59 @@
 """CLI module for handling user interaction with Rich library components."""
 
+import argparse
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional
 from rich.console import Console
 from rich.prompt import Prompt, Confirm
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
 from rich.table import Table
 
 console = Console()
+
+
+def parse_arguments() -> tuple[Optional[Path], bool]:
+    """Parse command-line arguments for path and dry-run flag.
+    
+    Returns:
+        tuple: (path or None, dry_run flag)
+    """
+    parser = argparse.ArgumentParser(
+        prog='sik',
+        description='Sik Sort - Organize files into categorized folders'
+    )
+    parser.add_argument(
+        'path',
+        nargs='?',
+        help='Source directory path to sort'
+    )
+    parser.add_argument(
+        '--dry',
+        '--dry-run',
+        action='store_true',
+        dest='dry_run',
+        help='Simulate operations without modifying files'
+    )
+    parser.add_argument(
+        '--force',
+        action='store_true',
+        help='Bypass safety checks (USE WITH EXTREME CAUTION!)'
+    )
+    
+    args = parser.parse_args()
+    
+    # If path is provided, validate it
+    if args.path:
+        path = Path(args.path)
+        if not path.exists():
+            display_error(f"Path does not exist: {args.path}")
+            raise SystemExit(1)
+        if not path.is_dir():
+            display_error(f"Path is not a directory: {args.path}")
+            raise SystemExit(1)
+        return path, args.dry_run
+    
+    # No path provided, will need to prompt
+    return None, args.dry_run
 
 
 def prompt_for_path() -> Path:

@@ -1,10 +1,10 @@
 """Main entry point for Sik Sort application."""
 
-import argparse
 from pathlib import Path
 from rich.console import Console
 from .classifier import FileCategory
 from .cli import (
+    parse_arguments,
     prompt_for_path,
     display_statistics,
     confirm_cleanup,
@@ -41,52 +41,32 @@ def setup_category_folders(source_path: Path, dry_run: bool = False) -> None:
 
 def main() -> None:
     """Main application flow."""
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(
-        description="Sik Sort - Organize files into categorized folders"
-    )
-    parser.add_argument(
-        '--force',
-        action='store_true',
-        help='Bypass safety checks (USE WITH EXTREME CAUTION!)'
-    )
-    parser.add_argument(
-        '--dry',
-        '--dry-run',
-        action='store_true',
-        dest='dry_run',
-        help='Simulate operations without modifying files'
-    )
-    args = parser.parse_args()
-    
     try:
+        # Parse command line arguments
+        source_path, dry_run = parse_arguments()
+        
         # Display welcome message
         console.print("[bold green]Welcome to Sik Sort![/bold green]")
         console.print()
         
         # Display dry-run banner if in dry-run mode
-        if args.dry_run:
+        if dry_run:
             display_dry_run_banner()
         
-        # Prompt for path
-        source_path = prompt_for_path()
+        # If no path provided via command line, prompt for it
+        if source_path is None:
+            source_path = prompt_for_path()
         
-        # Run safety checks unless --force is used
-        if not args.force:
-            warnings = run_safety_checks(source_path)
-            if warnings:
-                if not display_safety_warnings(warnings):
-                    console.print("[yellow]Operation cancelled for safety.[/yellow]")
-                    return
-        else:
-            console.print()
-            console.print("[bold red]⚠️  SAFETY CHECKS BYPASSED ⚠️[/bold red]")
-            console.print("[red]Proceeding without safety checks - use at your own risk![/red]")
-            console.print()
+        # Run safety checks (always run them for now, --force can be added later if needed)
+        warnings = run_safety_checks(source_path)
+        if warnings:
+            if not display_safety_warnings(warnings):
+                console.print("[yellow]Operation cancelled for safety.[/yellow]")
+                return
         
         # Setup category folders
         console.print("[cyan]Setting up category folders...[/cyan]")
-        setup_category_folders(source_path, dry_run=args.dry_run)
+        setup_category_folders(source_path, dry_run=dry_run)
         
         # Scan directory to count files
         console.print("[cyan]Scanning directory...[/cyan]")
@@ -104,7 +84,7 @@ def main() -> None:
         console.print("[cyan]Sorting files...[/cyan]")
         
         # Use ASCII progress bar
-        stats = sort_files(source_path, dry_run=args.dry_run, ascii_progress_callback=display_ascii_progress)
+        stats = sort_files(source_path, dry_run=dry_run, ascii_progress_callback=display_ascii_progress)
         
         # Print newline after progress bar completes
         print()
@@ -113,10 +93,10 @@ def main() -> None:
         console.print("[bold green]Sorting complete![/bold green]")
         
         # Display statistics
-        display_statistics(stats, dry_run=args.dry_run)
+        display_statistics(stats, dry_run=dry_run)
         
         # Skip cleanup prompt in dry-run mode
-        if not args.dry_run:
+        if not dry_run:
             # Prompt for cleanup
             if confirm_cleanup():
                 console.print("[cyan]Cleaning up empty directories...[/cyan]")
@@ -128,7 +108,7 @@ def main() -> None:
                 console.print("[yellow]Skipping cleanup.[/yellow]")
         
         # Display dry-run completion banner
-        if args.dry_run:
+        if dry_run:
             console.print()
             console.print("[bold yellow]" + "=" * 60 + "[/bold yellow]")
             console.print("[bold yellow]              DRY RUN COMPLETE                           [/bold yellow]")
