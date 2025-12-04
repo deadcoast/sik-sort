@@ -20,7 +20,14 @@ dev = [
 ]
 
 [project.scripts]
-sik = "sik_sort.main:main"
+sik = "src.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.setuptools.package-dir]
+sik_sort = "src"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

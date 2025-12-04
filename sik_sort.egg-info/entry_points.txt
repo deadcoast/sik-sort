@@ -1,0 +1,2 @@
+[console_scripts]
+sik = src.main:main

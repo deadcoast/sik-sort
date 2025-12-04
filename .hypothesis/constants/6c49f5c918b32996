@@ -1,0 +1,4 @@
+# file: C:\Users\ryanf\github\_new\sik-sort\src\safety.py
+# hypothesis_version: 6.148.2
+
+[', ', '.env', '.git', '.hypothesis', '.pytest_cache', '.tox', '.venv', '__init__.py', '__pycache__', 'build', 'dist', 'node_modules', 'pyproject.toml', 'setup.py', 'venv']

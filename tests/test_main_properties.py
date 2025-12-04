@@ -4,9 +4,9 @@ from pathlib import Path
 from hypothesis import given, strategies as st, settings
 import tempfile
 import shutil
-from sik_sort.main import setup_category_folders
-from sik_sort.sorter import sort_files, SortingStats
-from sik_sort.cleaner import find_empty_directories
+from src.main import setup_category_folders
+from src.sorter import sort_files, SortingStats
+from src.cleaner import find_empty_directories
 
 
 # Windows reserved names that cannot be used as directory names

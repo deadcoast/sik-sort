@@ -123,7 +123,12 @@
   - **Property 2: Invalid paths are rejected**
   - **Validates: Requirements 1.3**
 
-- [ ] 7. Implement main application flow
+- [x] 7. Implement main application flow
+
+
+
+
+
   - Create setup_category_folders() to create img, vid, arc, msk folders
   - Implement main() function to orchestrate the complete workflow:
     - Prompt for path
@@ -136,15 +141,21 @@
   - Add top-level error handling
   - _Requirements: 1.1, 1.2, 2.1, 4.1, 4.2, 5.1, 5.3_
 
-- [ ] 7.1 Write property test for category folders creation
+- [x] 7.1 Write property test for category folders creation
+
+
   - **Property 3: Category folders are created**
   - **Validates: Requirements 2.1**
 
-- [ ] 7.2 Write property test for statistics accuracy
+- [x] 7.2 Write property test for statistics accuracy
+
+
   - **Property 10: Statistics accuracy**
   - **Validates: Requirements 4.1, 4.2**
 
-- [ ] 7.3 Write property test for directory preservation when cleanup declined
+- [x] 7.3 Write property test for directory preservation when cleanup declined
+
+
   - **Property 12: Directory preservation when cleanup declined**
   - **Validates: Requirements 5.3**
 
