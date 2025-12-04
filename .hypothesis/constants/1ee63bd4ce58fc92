@@ -1,0 +1,4 @@
+# file: C:\Users\ryanf\github\_new\sik-sort\sik_sort\config.py
+# hypothesis_version: 6.148.5
+
+[1048576, 104857600, '%Y-%m', '.json', '.sik_manifests', '.yaml', '.yml', 'archive_mode', 'auto_cleanup', 'creation', 'csv', 'custom_categories', 'custom_extensions', 'date_format', 'date_mode', 'date_sorting_enabled', 'default_path', 'exclude_extensions', 'exclude_patterns', 'filters', 'hash_algorithm', 'include_extensions', 'include_patterns', 'json', 'manifest_dir', 'md5', 'medium_max', 'modification', 'report_enabled', 'report_format', 'report_path', 'sha256', 'size_medium_max', 'size_small_max', 'size_sorting_enabled', 'size_thresholds', 'small_max', 'undo_enabled']

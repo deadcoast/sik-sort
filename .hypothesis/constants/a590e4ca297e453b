@@ -1,0 +1,4 @@
+# file: C:\Users\ryanf\github\_new\sik-sort\sik_sort\size_classifier.py
+# hypothesis_version: 6.148.5
+
+[1024.0, 1048576, 104857600, '0 B', 'B', 'GB', 'KB', 'MB', 'TB', 'large', 'medium', 'small']
