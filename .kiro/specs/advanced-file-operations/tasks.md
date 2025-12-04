@@ -217,7 +217,9 @@ This implementation plan extends Sik Sort with nine advanced features: undo func
   - **Property 24: Hash algorithm selection**
   - **Validates: Requirements 5.5**
 
-- [-] 7. Extend sorter module with new sorting modes
+- [x] 7. Extend sorter module with new sorting modes
+
+
 
 
 
@@ -248,17 +250,22 @@ This implementation plan extends Sik Sort with nine advanced features: undo func
   - **Validates: Requirements 4.5**
 
 
+
 - [ ] 7.4 Write property test for date statistics accuracy
   - **Property 19: Date statistics accuracy**
+
   - **Validates: Requirements 4.6**
 
-- [ ] 7.5 Write property test for archive folder naming
+- [x] 7.5 Write property test for archive folder naming
+
   - **Property 33: Archive folder naming**
   - **Validates: Requirements 8.1**
+
 
 - [ ] 7.6 Write property test for archive flat structure
   - **Property 34: Archive mode flat structure**
   - **Validates: Requirements 8.2**
+
 
 - [ ] 7.7 Write property test for archive with type hierarchy
   - **Property 35: Archive mode with type hierarchy**

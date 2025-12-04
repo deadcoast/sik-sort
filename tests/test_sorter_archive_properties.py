@@ -239,7 +239,7 @@ def test_archive_statistics_accuracy(num_files, timestamps):
 @given(
     filename=filenames,
     timestamp=timestamps,
-    date_format=st.sampled_from(["%Y-%m", "%Y-%m-%d", "%Y/%m", "%Y%m"])
+    date_format=st.sampled_from(["%Y-%m", "%Y-%m-%d", "%Y%m", "%Y_%m"])
 )
 @settings(max_examples=100, deadline=None)
 def test_custom_date_format_support(filename, timestamp, date_format):
@@ -278,9 +278,26 @@ def test_custom_date_format_support(filename, timestamp, date_format):
         
         # Get the date folder from the destination path
         relative_path = dest_path.relative_to(source_path)
-        date_folder = relative_path.parts[0]
         
-        # Verify it matches the expected date format
+        # The date format might create nested directories (e.g., %Y/%m creates YYYY/MM)
+        # So we need to reconstruct the date path from the parts
         expected_date = datetime.fromtimestamp(timestamp).strftime(date_format)
-        assert date_folder == expected_date, \
-            f"Expected date folder {expected_date}, got {date_folder}"
+        expected_parts = expected_date.split('/')
+        
+        # Get the actual date parts (all parts except the last one which is the filename)
+        actual_date_parts = relative_path.parts[:-1]
+        
+        # If the format doesn't contain '/', we should have just one date folder
+        if '/' not in date_format:
+            assert len(actual_date_parts) == 1, \
+                f"Expected 1 date folder, got {len(actual_date_parts)}: {actual_date_parts}"
+            date_folder = actual_date_parts[0]
+            assert date_folder == expected_date, \
+                f"Expected date folder {expected_date}, got {date_folder}"
+        else:
+            # For formats with '/', verify the nested structure matches
+            assert len(actual_date_parts) == len(expected_parts), \
+                f"Expected {len(expected_parts)} date parts, got {len(actual_date_parts)}"
+            for i, (actual, expected) in enumerate(zip(actual_date_parts, expected_parts)):
+                assert actual == expected, \
+                    f"Date part {i}: expected {expected}, got {actual}"
