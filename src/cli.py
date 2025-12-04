@@ -87,3 +87,32 @@ def display_error(message: str) -> None:
         message: Error message to display
     """
     console.print(f"[bold red]Error:[/bold red] {message}")
+
+
+def display_safety_warnings(warnings: list[str]) -> bool:
+    """Display safety warnings and get user confirmation.
+    
+    Args:
+        warnings: List of warning messages
+        
+    Returns:
+        bool: True if user confirms to proceed, False otherwise
+    """
+    console.print()
+    console.print("[bold red]⚠️  SAFETY WARNING ⚠️[/bold red]")
+    console.print()
+    console.print("[yellow]The following concerns were detected:[/yellow]")
+    console.print()
+    
+    for i, warning in enumerate(warnings, 1):
+        console.print(f"  [red]{i}.[/red] {warning}")
+    
+    console.print()
+    console.print("[bold yellow]Sorting this directory may reorganize important development files![/bold yellow]")
+    console.print("[yellow]This could break your project or make files difficult to find.[/yellow]")
+    console.print()
+    
+    return Confirm.ask(
+        "[bold red]Are you ABSOLUTELY SURE you want to proceed?[/bold red]",
+        default=False
+    )
