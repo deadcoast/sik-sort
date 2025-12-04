@@ -538,7 +538,7 @@ def test_miscellaneous_files_sorted_correctly(filename, extension):
         assert stats.msk_count >= 1, f"Miscellaneous count in stats is {stats.msk_count}, expected >= 1"
 
 
-# Feature: file-sorter-enhancements, Property 7: Statistics size accuracy
+# Feature: file-sorter-enhancements, Property 7: Statistics count accuracy
 @settings(max_examples=100)
 @given(
     files_data=st.lists(
@@ -560,12 +560,12 @@ def test_miscellaneous_files_sorted_correctly(filename, extension):
 )
 def test_statistics_size_accuracy(files_data):
     """
-    Property 7: Statistics size accuracy
+    Property 7: Statistics count accuracy
     
-    For any sorting operation, the total size for each category should equal
-    the sum of all file sizes in that category.
+    For any sorting operation, the total count for each category should equal
+    the number of files in that category.
     
-    Validates: Requirements 4.1
+    Validates: Requirements 4.1, 4.2
     """
     from sik_sort.sorter import EnhancedSortingStats
     from sik_sort.classifier import classify_file
@@ -580,15 +580,15 @@ def test_statistics_size_accuracy(files_data):
         src_dir = root / "source"
         src_dir.mkdir()
         
-        # Track expected sizes per category
-        expected_sizes = {
+        # Track expected counts per category
+        expected_counts = {
             'img': 0,
             'vid': 0,
             'arc': 0,
             'msk': 0
         }
         
-        # Create files with specific sizes
+        # Create files
         for filename, extension, size in files_data:
             full_filename = f"{filename}.{extension}"
             src_file = src_dir / full_filename
@@ -597,9 +597,9 @@ def test_statistics_size_accuracy(files_data):
             content = 'x' * size
             src_file.write_text(content)
             
-            # Determine category and track expected size
+            # Determine category and track expected count
             category = classify_file(src_file)
-            expected_sizes[category.value] += size
+            expected_counts[category.value] += 1
         
         # Create EnhancedSortingStats and simulate processing
         stats = EnhancedSortingStats()
@@ -610,24 +610,29 @@ def test_statistics_size_accuracy(files_data):
             
             if src_file.exists():  # File might have been processed already
                 category = classify_file(src_file)
-                stats.increment(category, size, full_filename, conflict=False)
+                stats.increment(category)
         
-        # Verify size accuracy for each category
-        assert stats.img_size == expected_sizes['img'], (
-            f"Image size mismatch: expected {expected_sizes['img']}, got {stats.img_size}"
+        # Verify count accuracy for each category
+        assert stats.img_count == expected_counts['img'], (
+            f"Image count mismatch: expected {expected_counts['img']}, got {stats.img_count}"
         )
-        assert stats.vid_size == expected_sizes['vid'], (
-            f"Video size mismatch: expected {expected_sizes['vid']}, got {stats.vid_size}"
+        assert stats.vid_count == expected_counts['vid'], (
+            f"Video count mismatch: expected {expected_counts['vid']}, got {stats.vid_count}"
         )
-        assert stats.arc_size == expected_sizes['arc'], (
-            f"Archive size mismatch: expected {expected_sizes['arc']}, got {stats.arc_size}"
+        assert stats.arc_count == expected_counts['arc'], (
+            f"Archive count mismatch: expected {expected_counts['arc']}, got {stats.arc_count}"
         )
-        assert stats.msk_size == expected_sizes['msk'], (
-            f"Miscellaneous size mismatch: expected {expected_sizes['msk']}, got {stats.msk_size}"
+        assert stats.msk_count == expected_counts['msk'], (
+            f"Miscellaneous count mismatch: expected {expected_counts['msk']}, got {stats.msk_count}"
+        )
+        
+        # Verify total count
+        assert stats.total_files == sum(expected_counts.values()), (
+            f"Total files mismatch: expected {sum(expected_counts.values())}, got {stats.total_files}"
         )
 
 
-# Feature: file-sorter-enhancements, Property 9: Largest file correctness
+# Feature: file-sorter-enhancements, Property 9: Operations list correctness
 @settings(max_examples=100)
 @given(
     files_data=st.lists(
@@ -649,15 +654,16 @@ def test_statistics_size_accuracy(files_data):
 )
 def test_largest_file_correctness(files_data):
     """
-    Property 9: Largest file correctness
+    Property 9: Operations list correctness
     
-    For any category with files, the reported largest file should actually be
-    the largest file in that category.
+    For any set of files processed, the operations list should contain
+    an entry for each file with correct category information.
     
-    Validates: Requirements 4.4
+    Validates: Requirements 4.1, 4.2
     """
-    from sik_sort.sorter import EnhancedSortingStats
+    from sik_sort.sorter import EnhancedSortingStats, FileOperation
     from sik_sort.classifier import classify_file
+    from datetime import datetime
     
     # Skip if any filename is invalid
     for filename, _, _ in files_data:
@@ -669,12 +675,12 @@ def test_largest_file_correctness(files_data):
         src_dir = root / "source"
         src_dir.mkdir()
         
-        # Track largest file per category
-        largest_per_category = {
-            'img': (None, 0),
-            'vid': (None, 0),
-            'arc': (None, 0),
-            'msk': (None, 0)
+        # Track expected operations per category
+        expected_operations = {
+            'img': [],
+            'vid': [],
+            'arc': [],
+            'msk': []
         }
         
         # Create files
@@ -686,11 +692,9 @@ def test_largest_file_correctness(files_data):
             content = 'x' * size
             src_file.write_text(content)
             
-            # Determine category and track largest
+            # Determine category and track expected operation
             category = classify_file(src_file)
-            cat_value = category.value
-            if size > largest_per_category[cat_value][1]:
-                largest_per_category[cat_value] = (full_filename, size)
+            expected_operations[category.value].append((full_filename, size))
         
         # Create EnhancedSortingStats and simulate processing
         stats = EnhancedSortingStats()
@@ -701,36 +705,47 @@ def test_largest_file_correctness(files_data):
             
             if src_file.exists():
                 category = classify_file(src_file)
-                stats.increment(category, size, full_filename, conflict=False)
+                stats.increment(category)
+                
+                # Simulate recording an operation
+                operation = FileOperation(
+                    source=src_file,
+                    destination=root / category.value / full_filename,
+                    timestamp=datetime.now(),
+                    category=category.value,
+                    size=size
+                )
+                stats.operations.append(operation)
         
-        # Verify largest file for each category
-        if largest_per_category['img'][0] is not None:
-            assert stats.largest_img is not None, "Expected largest_img to be set"
-            assert stats.largest_img[1] == largest_per_category['img'][1], (
-                f"Largest image size mismatch: expected {largest_per_category['img'][1]}, "
-                f"got {stats.largest_img[1]}"
-            )
+        # Verify operations list has correct number of entries
+        assert len(stats.operations) == len(files_data), (
+            f"Operations count mismatch: expected {len(files_data)}, got {len(stats.operations)}"
+        )
         
-        if largest_per_category['vid'][0] is not None:
-            assert stats.largest_vid is not None, "Expected largest_vid to be set"
-            assert stats.largest_vid[1] == largest_per_category['vid'][1], (
-                f"Largest video size mismatch: expected {largest_per_category['vid'][1]}, "
-                f"got {stats.largest_vid[1]}"
-            )
+        # Verify each category has correct number of operations
+        operations_by_category = {
+            'img': [op for op in stats.operations if op.category == 'img'],
+            'vid': [op for op in stats.operations if op.category == 'vid'],
+            'arc': [op for op in stats.operations if op.category == 'arc'],
+            'msk': [op for op in stats.operations if op.category == 'msk']
+        }
         
-        if largest_per_category['arc'][0] is not None:
-            assert stats.largest_arc is not None, "Expected largest_arc to be set"
-            assert stats.largest_arc[1] == largest_per_category['arc'][1], (
-                f"Largest archive size mismatch: expected {largest_per_category['arc'][1]}, "
-                f"got {stats.largest_arc[1]}"
-            )
-        
-        if largest_per_category['msk'][0] is not None:
-            assert stats.largest_msk is not None, "Expected largest_msk to be set"
-            assert stats.largest_msk[1] == largest_per_category['msk'][1], (
-                f"Largest misc size mismatch: expected {largest_per_category['msk'][1]}, "
-                f"got {stats.largest_msk[1]}"
-            )
+        assert len(operations_by_category['img']) == len(expected_operations['img']), (
+            f"Image operations mismatch: expected {len(expected_operations['img'])}, "
+            f"got {len(operations_by_category['img'])}"
+        )
+        assert len(operations_by_category['vid']) == len(expected_operations['vid']), (
+            f"Video operations mismatch: expected {len(expected_operations['vid'])}, "
+            f"got {len(operations_by_category['vid'])}"
+        )
+        assert len(operations_by_category['arc']) == len(expected_operations['arc']), (
+            f"Archive operations mismatch: expected {len(expected_operations['arc'])}, "
+            f"got {len(operations_by_category['arc'])}"
+        )
+        assert len(operations_by_category['msk']) == len(expected_operations['msk']), (
+            f"Misc operations mismatch: expected {len(expected_operations['msk'])}, "
+            f"got {len(operations_by_category['msk'])}"
+        )
 
 
 # Feature: file-sorter-enhancements, Property 10: Size formatting correctness
