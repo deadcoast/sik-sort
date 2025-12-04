@@ -174,7 +174,12 @@ This implementation plan extends Sik Sort with nine advanced features: undo func
   - **Property 17: Modification date used when specified**
   - **Validates: Requirements 4.3**
 
-- [ ] 6. Implement duplicate detector module
+- [x] 6. Implement duplicate detector module
+
+
+
+
+
   - Create duplicates.py with DuplicateStats dataclass
   - Implement find_duplicates() to identify files with identical content
   - Implement compute_hash() supporting MD5 and SHA256 algorithms
@@ -182,27 +187,40 @@ This implementation plan extends Sik Sort with nine advanced features: undo func
   - Use streaming hash computation for large files
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
-- [ ] 6.1 Write property test for hash computation
+- [x] 6.1 Write property test for hash computation
+
+
   - **Property 20: Hash computation for all files**
   - **Validates: Requirements 5.1**
 
-- [ ] 6.2 Write property test for duplicate handling
+- [x] 6.2 Write property test for duplicate handling
+
+
   - **Property 21: Duplicate handling correctness**
   - **Validates: Requirements 5.2**
 
-- [ ] 6.3 Write property test for duplicate filename preservation
+- [x] 6.3 Write property test for duplicate filename preservation
+
+
   - **Property 22: Duplicate filename preservation**
   - **Validates: Requirements 5.3**
 
-- [ ] 6.4 Write property test for duplicate statistics
+- [x] 6.4 Write property test for duplicate statistics
+
+
   - **Property 23: Duplicate statistics accuracy**
   - **Validates: Requirements 5.4**
 
-- [ ] 6.5 Write property test for hash algorithm selection
+- [x] 6.5 Write property test for hash algorithm selection
+
+
   - **Property 24: Hash algorithm selection**
   - **Validates: Requirements 5.5**
 
-- [ ] 7. Extend sorter module with new sorting modes
+- [-] 7. Extend sorter module with new sorting modes
+
+
+
   - Add EnhancedSortingStats dataclass to sorter.py
   - Implement sort_files_with_size() for size-based sorting with hierarchy
   - Implement sort_files_with_date() for date-based sorting with hierarchy
@@ -211,17 +229,24 @@ This implementation plan extends Sik Sort with nine advanced features: undo func
   - Update existing sort_files() to record FileOperation objects
   - _Requirements: 3.4, 3.5, 4.5, 4.6, 5.2, 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 7.1 Write property test for size hierarchy structure
+- [x] 7.1 Write property test for size hierarchy structure
+
+
   - **Property 13: Size hierarchy structure**
   - **Validates: Requirements 3.4**
+
 
 - [ ] 7.2 Write property test for size statistics accuracy
   - **Property 14: Size statistics accuracy**
   - **Validates: Requirements 3.5**
 
-- [ ] 7.3 Write property test for date hierarchy structure
+
+
+- [x] 7.3 Write property test for date hierarchy structure
+
   - **Property 18: Date hierarchy structure**
   - **Validates: Requirements 4.5**
+
 
 - [ ] 7.4 Write property test for date statistics accuracy
   - **Property 19: Date statistics accuracy**
