@@ -18,6 +18,7 @@ from .sorter import sort_files
 from .scanner import scan_directory
 from .cleaner import find_empty_directories, remove_empty_directories
 from .safety import run_safety_checks
+from .operation_logger import log_scan_complete
 
 console = Console()
 
@@ -77,7 +78,8 @@ def main() -> None:
             console.print("[yellow]No files found to sort.[/yellow]")
             return
         
-        console.print(f"[green]Found {len(files)} files to sort.[/green]")
+        # Log scan completion with file count
+        log_scan_complete(len(files))
         console.print()
         
         # Sort files with progress display

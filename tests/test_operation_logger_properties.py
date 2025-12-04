@@ -18,8 +18,12 @@ from sik_sort.classifier import FileCategory
     filename=st.text(
         min_size=1, 
         max_size=50,
-        alphabet=st.characters(min_codepoint=32, max_codepoint=126)  # Printable ASCII only
-    ),
+        alphabet=st.characters(
+            min_codepoint=32, 
+            max_codepoint=126,
+            blacklist_characters='[]<>\\/:*?"|'  # Exclude invalid filename chars and Rich markup chars
+        )
+    ).filter(lambda x: x.strip()),  # Ensure non-empty after stripping
     category=st.sampled_from([FileCategory.IMAGE, FileCategory.VIDEO, FileCategory.ARCHIVE, FileCategory.MISC])
 )
 def test_operation_log_contains_filename_and_category(filename, category):
@@ -128,18 +132,30 @@ def test_consistent_category_formatting(files):
     filename=st.text(
         min_size=1, 
         max_size=50,
-        alphabet=st.characters(min_codepoint=32, max_codepoint=126)  # Printable ASCII only
-    ),
+        alphabet=st.characters(
+            min_codepoint=32, 
+            max_codepoint=126,
+            blacklist_characters='[]<>\\/:*?"|'  # Exclude invalid filename chars and Rich markup chars
+        )
+    ).filter(lambda x: x.strip()),  # Ensure non-empty after stripping
     error_message=st.text(
         min_size=1, 
         max_size=100,
-        alphabet=st.characters(min_codepoint=32, max_codepoint=126)  # Printable ASCII only
-    ),
+        alphabet=st.characters(
+            min_codepoint=32, 
+            max_codepoint=126,
+            blacklist_characters='[]<>'  # Exclude Rich markup chars
+        )
+    ).filter(lambda x: x.strip()),  # Ensure non-empty after stripping
     normal_filename=st.text(
         min_size=1, 
         max_size=50,
-        alphabet=st.characters(min_codepoint=32, max_codepoint=126)  # Printable ASCII only
-    ),
+        alphabet=st.characters(
+            min_codepoint=32, 
+            max_codepoint=126,
+            blacklist_characters='[]<>\\/:*?"|'  # Exclude invalid filename chars and Rich markup chars
+        )
+    ).filter(lambda x: x.strip()),  # Ensure non-empty after stripping
     category=st.sampled_from([FileCategory.IMAGE, FileCategory.VIDEO, FileCategory.ARCHIVE, FileCategory.MISC])
 )
 def test_error_log_visual_distinction(filename, error_message, normal_filename, category):

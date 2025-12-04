@@ -15,9 +15,12 @@ sik_sort.egg-info/dependency_links.txt
 sik_sort.egg-info/entry_points.txt
 sik_sort.egg-info/requires.txt
 sik_sort.egg-info/top_level.txt
+tests/test_ascii_progress_properties.py
 tests/test_classifier_properties.py
 tests/test_cleaner_properties.py
+tests/test_cli_args_properties.py
 tests/test_cli_properties.py
+tests/test_dry_run_properties.py
 tests/test_main_properties.py
 tests/test_operation_logger_properties.py
 tests/test_scanner_properties.py

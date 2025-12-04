@@ -1,5 +1,6 @@
 """Folder cleaner module for removing empty directories."""
 
+import os
 from pathlib import Path
 
 
@@ -17,7 +18,7 @@ def find_empty_directories(root_path: Path, preserve_dirs: set[str]) -> list[Pat
     
     # Walk the directory tree bottom-up so we can detect empty directories
     # after their subdirectories have been processed
-    for dirpath, dirnames, filenames in root_path.walk(top_down=False):
+    for dirpath, dirnames, filenames in os.walk(root_path, topdown=False):
         current_dir = Path(dirpath)
         
         # Skip if this is a preserved directory

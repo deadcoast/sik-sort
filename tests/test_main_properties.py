@@ -106,8 +106,8 @@ def test_statistics_accuracy(num_images, num_videos, num_archives, num_misc):
             file_path = test_dir / f"misc_{i}{ext}"
             file_path.touch()
         
-        # Sort files
-        stats = sort_files(test_dir, lambda: None)
+        # Sort files (not in dry-run mode)
+        stats = sort_files(test_dir, dry_run=False)
         
         # Verify statistics accuracy
         expected_total = num_images + num_videos + num_archives + num_misc
@@ -188,7 +188,7 @@ def test_directory_preservation_when_cleanup_declined(num_subdirs, num_files):
             file_path.touch()
         
         # Sort files (this will move files and potentially leave empty directories)
-        sort_files(test_dir, lambda: None)
+        sort_files(test_dir, dry_run=False)
         
         # Get the directory structure before "declining cleanup"
         # (we simulate declining by not calling remove_empty_directories)
