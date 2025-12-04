@@ -1,2 +1,2 @@
 [console_scripts]
-sik = src.main:main
+sik = sik_sort.main:main

@@ -159,31 +159,53 @@
   - **Property 12: Directory preservation when cleanup declined**
   - **Validates: Requirements 5.3**
 
-- [ ] 8. Implement property tests for file sorting by category
+- [x] 8. Implement property tests for file sorting by category
+
+
+
+
+
   - _Requirements: 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 8.1 Write property test for image file sorting
+
+- [x] 8.1 Write property test for image file sorting
+
   - **Property 4: Image files are sorted correctly**
   - **Validates: Requirements 2.2**
 
-- [ ] 8.2 Write property test for video file sorting
+- [x] 8.2 Write property test for video file sorting
+
+
   - **Property 5: Video files are sorted correctly**
   - **Validates: Requirements 2.3**
 
-- [ ] 8.3 Write property test for archive file sorting
+- [x] 8.3 Write property test for archive file sorting
+
+
   - **Property 6: Archive files are sorted correctly**
   - **Validates: Requirements 2.4**
 
-- [ ] 8.4 Write property test for miscellaneous file sorting
+- [x] 8.4 Write property test for miscellaneous file sorting
+
+
   - **Property 7: Miscellaneous files are sorted correctly**
   - **Validates: Requirements 2.5**
 
-- [ ] 9. Create package entry point and installation setup
+- [x] 9. Create package entry point and installation setup
+
+
+
+
   - Configure pyproject.toml with console_scripts entry point for `sik` command
   - Add package metadata (name, version, description, author)
   - Create README with installation and usage instructions
   - Test installation with `pip install -e .`
   - _Requirements: All_
 
-- [ ] 10. Final checkpoint - Ensure all tests pass
+- [x] 10. Final checkpoint - Ensure all tests pass
+
+
+
+
+
   - Ensure all tests pass, ask the user if questions arise.

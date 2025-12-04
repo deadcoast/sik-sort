@@ -1,0 +1,4 @@
+# file: C:\Users\ryanf\github\_new\sik-sort\sik_sort\operation_logger.py
+# hypothesis_version: 6.148.2
+
+['%Y%m%d_%H%M%S', '.sik_sort', 'category', 'conflict_resolved', 'destination', 'end_time', 'logs', 'operation_log_*.json', 'operations', 'r', 'source', 'start_time', 'timestamp', 'w']

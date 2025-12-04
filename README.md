@@ -1,74 +1,247 @@
 # Sik Sort
 
-A command-line utility for Windows that organizes files from a specified directory into categorized folders based on file type.
+A command-line utility for Windows that organizes files from a specified directory into categorized folders based on file type. Sik Sort recursively processes all files and subdirectories, intelligently categorizing and moving files while handling conflicts gracefully.
 
 ## Features
 
-- Recursively processes all files in a directory and subdirectories
-- Organizes files into four categories:
-  - `img` - Image files (jpg, png, gif, etc.)
-  - `vid` - Video files (mp4, avi, mov, etc.)
-  - `arc` - Archive files (zip, rar, 7z, etc.)
+- **Recursive Processing**: Automatically processes all files in a directory and its subdirectories
+- **Smart Categorization**: Organizes files into four predefined categories:
+  - `img` - Image files (jpg, jpeg, png, gif, bmp, tiff, webp, svg)
+  - `vid` - Video files (mp4, avi, mov, mkv, wmv, flv, webm, m4v, mpg, mpeg)
+  - `arc` - Archive files (zip, rar, 7z, tar, gz, bz2, xz, iso)
   - `msk` - Miscellaneous files (everything else)
-- Handles file name conflicts automatically
-- Displays statistics after sorting
-- Optional cleanup of empty directories
-- Enhanced terminal interface using Rich library
+- **Conflict Resolution**: Automatically handles file name conflicts by appending unique identifiers
+- **Case-Insensitive**: File extensions are matched case-insensitively
+- **Statistics Display**: Shows detailed statistics after sorting with beautiful formatting
+- **Empty Directory Cleanup**: Optional removal of empty directories after sorting
+- **Safety Checks**: Built-in safety warnings for system directories and large operations
+- **Enhanced UI**: Beautiful terminal interface powered by the Rich library
 
 ## Installation
 
-Install the package in development mode:
+### Prerequisites
+
+- Python 3.8 or higher
+- pip (Python package installer)
+
+### Install from Source
+
+1. Clone or download this repository
+2. Navigate to the project directory
+3. Install the package:
 
 ```bash
 pip install -e .
 ```
 
-For development with testing dependencies:
+This installs Sik Sort in "editable" mode, making the `sik` command available system-wide.
+
+### Install with Development Dependencies
+
+If you want to run tests or contribute to development:
 
 ```bash
 pip install -e ".[dev]"
 ```
 
+This includes pytest and hypothesis for testing.
+
+### Verify Installation
+
+After installation, verify the `sik` command is available:
+
+```bash
+sik --help
+```
+
 ## Usage
 
-Run the `sik` command from your terminal:
+### Basic Usage
+
+Simply run the `sik` command from your terminal:
 
 ```bash
 sik
 ```
 
-The application will:
-1. Prompt you for a source directory path
-2. Scan and organize all files into category folders
-3. Display statistics about the sorting operation
-4. Ask if you want to clean up empty directories
+The application will guide you through the process:
 
-## Requirements
+1. **Enter Source Path**: You'll be prompted to enter the directory path you want to organize
+2. **Safety Checks**: The system will check for potential issues (system directories, large file counts)
+3. **Scanning**: Sik Sort scans the directory to find all files
+4. **Sorting**: Files are moved to their appropriate category folders with a progress bar
+5. **Statistics**: A summary table shows how many files were moved to each category
+6. **Cleanup**: You'll be asked if you want to remove empty directories
 
-- Python 3.8 or higher
-- Rich library (for enhanced terminal UI)
+### Command-Line Options
+
+```bash
+sik [OPTIONS]
+```
+
+**Options:**
+- `--force`: Bypass safety checks (USE WITH EXTREME CAUTION!)
+- `--help`: Show help message and exit
+
+### Example Session
+
+```
+Welcome to Sik Sort!
+
+Enter the path to the directory you want to organize: C:\Users\YourName\Downloads
+
+Setting up category folders...
+Scanning directory...
+Found 150 files to sort.
+
+Sorting files...
+Processing files... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+
+Sorting complete!
+
+┏━━━━━━━━━━━━━━┳━━━━━━━┓
+┃ Category     ┃ Count ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━┩
+│ Images       │    45 │
+│ Videos       │    12 │
+│ Archives     │     8 │
+│ Miscellaneous│    85 │
+│ Total        │   150 │
+└──────────────┴───────┘
+
+Would you like to clean up empty directories? (y/n): y
+Cleaning up empty directories...
+Removed 3 empty directories.
+
+Done!
+```
+
+## How It Works
+
+1. **Category Folder Creation**: Creates four folders (img, vid, arc, msk) in your source directory
+2. **File Discovery**: Recursively scans all subdirectories, excluding the category folders themselves
+3. **Classification**: Each file is classified based on its extension using case-insensitive matching
+4. **File Moving**: Files are moved to their appropriate category folder
+5. **Conflict Handling**: If a file with the same name exists, a unique identifier is appended (e.g., `photo_1.jpg`, `photo_2.jpg`)
+6. **Statistics**: Tracks and displays the number of files moved to each category
+7. **Cleanup**: Optionally removes empty directories left behind after moving files
+
+## Supported File Types
+
+### Images (img)
+jpg, jpeg, png, gif, bmp, tiff, webp, svg
+
+### Videos (vid)
+mp4, avi, mov, mkv, wmv, flv, webm, m4v, mpg, mpeg
+
+### Archives (arc)
+zip, rar, 7z, tar, gz, bz2, xz, iso
+
+### Miscellaneous (msk)
+All other file types
+
+## Safety Features
+
+Sik Sort includes built-in safety checks to prevent accidental damage:
+
+- **System Directory Protection**: Warns when operating on system directories
+- **Large Operation Warning**: Alerts when processing a large number of files
+- **Conflict Resolution**: Never overwrites existing files
+- **Category Folder Preservation**: Never deletes category folders during cleanup
+
+You can bypass safety checks with the `--force` flag, but this is not recommended.
 
 ## Development
 
+### Project Structure
+
+```
+sik-sort/
+├── src/
+│   ├── __init__.py
+│   ├── cli.py              # CLI interaction with Rich library
+│   ├── classifier.py       # File type classification
+│   ├── sorter.py           # File sorting logic
+│   ├── scanner.py          # Directory traversal
+│   ├── cleaner.py          # Empty folder cleanup
+│   ├── safety.py           # Safety checks
+│   ├── operation_logger.py # Operation logging
+│   └── main.py             # Application entry point
+├── tests/
+│   ├── test_*_properties.py # Property-based tests
+│   └── __init__.py
+├── pyproject.toml          # Project configuration
+└── README.md               # This file
+```
+
 ### Running Tests
+
+Run all tests:
 
 ```bash
 pytest
 ```
 
-### Project Structure
+Run with verbose output:
 
+```bash
+pytest -v
 ```
-sik_sort/
-├── __init__.py
-├── cli.py          # CLI interaction with Rich library
-├── classifier.py   # File type classification
-├── sorter.py       # File sorting logic
-├── scanner.py      # Directory traversal
-├── cleaner.py      # Empty folder cleanup
-└── main.py         # Application entry point
+
+Run specific test file:
+
+```bash
+pytest tests/test_classifier_properties.py
 ```
+
+### Testing Strategy
+
+Sik Sort uses both unit tests and property-based tests (using Hypothesis) to ensure correctness:
+
+- **Unit Tests**: Verify specific examples and edge cases
+- **Property Tests**: Verify universal properties across randomly generated inputs
+
+Each property test runs a minimum of 100 iterations to ensure thorough coverage.
+
+## Troubleshooting
+
+### Command Not Found
+
+If `sik` command is not found after installation:
+
+1. Ensure pip's script directory is in your PATH
+2. Try reinstalling: `pip uninstall sik-sort && pip install -e .`
+3. Use the full path to the script (usually in `Scripts` folder of your Python installation)
+
+### Permission Errors
+
+If you encounter permission errors:
+
+1. Run your terminal as Administrator (Windows)
+2. Ensure you have write permissions to the target directory
+3. Check that files aren't locked by other applications
+
+### Files Not Moving
+
+If files aren't being moved:
+
+1. Check that the source path is correct
+2. Verify files aren't in use by other applications
+3. Ensure sufficient disk space is available
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## License
 
-MIT
+MIT License - See LICENSE file for details
+
+## Author
+
+Sik Sort Team
+
+## Acknowledgments
+
+- Built with [Rich](https://github.com/Textualize/rich) for beautiful terminal output
+- Tested with [Hypothesis](https://hypothesis.readthedocs.io/) for property-based testing

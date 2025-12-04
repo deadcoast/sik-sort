@@ -5,10 +5,26 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "sik-sort"
 version = "0.1.0"
-description = "A command-line utility for organizing files into categorized folders"
-authors = [{name = "Sik Sort Team"}]
+description = "A command-line utility for organizing files into categorized folders based on file type"
+authors = [{name = "Sik Sort Team", email = "team@siksort.example.com"}]
 readme = "README.md"
 requires-python = ">=3.8"
+license = {text = "MIT"}
+keywords = ["file-organizer", "cli", "file-management", "sorting"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: System :: Filesystems",
+    "Topic :: Utilities",
+]
 dependencies = [
     "rich>=13.0.0",
 ]
@@ -20,14 +36,11 @@ dev = [
 ]
 
 [project.scripts]
-sik = "src.main:main"
+sik = "sik_sort.main:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["src*"]
-
-[tool.setuptools.package-dir]
-sik_sort = "src"
+include = ["sik_sort*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
