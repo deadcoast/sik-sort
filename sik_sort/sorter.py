@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Optional, Union
 from datetime import datetime
 import shutil
 from .classifier import FileCategory, classify_file
@@ -47,7 +47,7 @@ class FileOperation:
     timestamp: datetime
     category: str
     size: int
-    hash: str | None = None
+    hash: Optional[str] = None
 
 
 @dataclass
@@ -64,10 +64,10 @@ class EnhancedSortingStats:
     excluded_by_filters: int = 0
     duplicates_found: int = 0
     space_saved: int = 0
-    size_categories: dict[str, int] = field(default_factory=dict)
-    date_categories: dict[str, int] = field(default_factory=dict)
-    operations: list[FileOperation] = field(default_factory=list)
-    errors: list[str] = field(default_factory=list)
+    size_categories: dict = field(default_factory=dict)
+    date_categories: dict = field(default_factory=dict)
+    operations: list = field(default_factory=list)
+    errors: list = field(default_factory=list)
     
     def increment(self, category: FileCategory) -> None:
         """Increment counter for given category.
@@ -112,7 +112,7 @@ class EnhancedSortingStats:
             return f"{size:.2f} {units[unit_index]}"
 
 
-def sort_files(source_path: Path, dry_run: bool = False, progress_callback: Callable = None, ascii_progress_callback: Callable = None, record_operations: bool = False) -> SortingStats | EnhancedSortingStats:
+def sort_files(source_path: Path, dry_run: bool = False, progress_callback: Callable = None, ascii_progress_callback: Callable = None, record_operations: bool = False) -> Union[SortingStats, EnhancedSortingStats]:
     """Main sorting orchestrator.
     
     Args:

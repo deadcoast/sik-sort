@@ -596,6 +596,10 @@ UV is a modern Python package manager that offers several advantages:
 
 While pip still works perfectly fine, UV provides a significantly better developer experience, especially for projects with many dependencies or when running tests frequently.
 
+For a comprehensive list of UV commands, see [UV_QUICK_REFERENCE.md](UV_QUICK_REFERENCE.md).
+
+> **Migrating from pip?** See [MIGRATION_TO_UV.md](MIGRATION_TO_UV.md) for a complete migration guide, or use our automated migration scripts in the `scripts/` directory.
+
 ## Acknowledgments
 
 - Built with [Rich](https://github.com/Textualize/rich) for beautiful terminal output
