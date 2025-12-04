@@ -19,7 +19,7 @@ Classifier: Topic :: System :: Filesystems
 Classifier: Topic :: Utilities
 Requires-Python: >=3.8
 Description-Content-Type: text/markdown
-Requires-Dist: rich>=13.0.0
+Requires-Dist: rich<14.0.0,>=13.0.0
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0.0; extra == "dev"
 Requires-Dist: hypothesis>=6.0.0; extra == "dev"

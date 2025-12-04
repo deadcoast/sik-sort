@@ -1,146 +1,236 @@
 """Property-based tests for operation logger module."""
 
-import tempfile
-import json
-from pathlib import Path
-from hypothesis import given, strategies as st, settings, assume
+from io import StringIO
+from hypothesis import given, strategies as st, settings
+from rich.console import Console
 from sik_sort.operation_logger import (
-    create_operation_log,
-    log_file_movement,
-    finalize_log,
-    read_latest_log,
-    get_log_path,
-    FileOperation,
-    OperationLog
+    log_file_operation,
+    log_scan_complete,
+    log_conflict_resolution,
+    log_error
 )
 from sik_sort.classifier import FileCategory
 
 
-# Windows reserved names that cannot be used as file or directory names
-WINDOWS_RESERVED_NAMES = {
-    'CON', 'PRN', 'AUX', 'NUL',
-    'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
-    'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9'
-}
-
-
-def is_valid_windows_name(name: str) -> bool:
-    """Check if a name is valid on Windows."""
-    if not name or name.upper() in WINDOWS_RESERVED_NAMES:
-        return False
-    # Check if name ends with space or period (invalid on Windows)
-    if name.endswith(' ') or name.endswith('.'):
-        return False
-    return True
-
-
-# Feature: file-sorter-enhancements, Property 4: Operation log completeness
+# Feature: file-sorter-cli, Property 17: Operation logs display file and category
 @settings(max_examples=100)
 @given(
-    operations_data=st.lists(
+    filename=st.text(
+        min_size=1, 
+        max_size=50,
+        alphabet=st.characters(min_codepoint=32, max_codepoint=126)  # Printable ASCII only
+    ),
+    category=st.sampled_from([FileCategory.IMAGE, FileCategory.VIDEO, FileCategory.ARCHIVE, FileCategory.MISC])
+)
+def test_operation_log_contains_filename_and_category(filename, category):
+    """
+    Property 17: Operation logs display file and category
+    
+    For any file being processed, the operation log should contain both
+    the filename and the destination category.
+    
+    Validates: Requirements 9.1
+    """
+    # Capture console output
+    string_io = StringIO()
+    test_console = Console(file=string_io, force_terminal=True, width=120)
+    
+    # Temporarily replace the global console
+    import sik_sort.operation_logger as logger_module
+    original_console = logger_module.console
+    logger_module.console = test_console
+    
+    try:
+        # Log the operation
+        log_file_operation(filename, category, dry_run=False)
+        
+        # Get the output
+        output = string_io.getvalue()
+        
+        # Verify filename is in the output
+        assert filename in output, f"Filename '{filename}' not found in log output: {output}"
+        
+        # Verify category is in the output (either as value or uppercase)
+        assert category.value in output or category.value.upper() in output, (
+            f"Category '{category.value}' not found in log output: {output}"
+        )
+    finally:
+        # Restore original console
+        logger_module.console = original_console
+
+
+# Feature: file-sorter-cli, Property 18: Consistent category formatting
+@settings(max_examples=100)
+@given(
+    files=st.lists(
         st.tuples(
-            st.text(
-                min_size=1,
-                max_size=20,
-                alphabet=st.characters(
-                    whitelist_categories=('Lu', 'Ll', 'Nd'),
-                    blacklist_characters=['/', '\\', '\0', ':', '*', '?', '"', '<', '>', '|', '.']
-                )
-            ),
-            st.sampled_from(['jpg', 'mp4', 'zip', 'txt']),
-            st.sampled_from([FileCategory.IMAGE, FileCategory.VIDEO, FileCategory.ARCHIVE, FileCategory.MISC]),
-            st.booleans()  # conflict_resolved
+            st.text(min_size=1, max_size=30),
+            st.just(FileCategory.IMAGE)  # Use same category for consistency check
         ),
-        min_size=1,
-        max_size=50
+        min_size=2,
+        max_size=10
     )
 )
-def test_operation_log_completeness(operations_data):
+def test_consistent_category_formatting(files):
     """
-    Property 4: Operation log completeness
+    Property 18: Consistent category formatting
     
-    For any sorting operation, the operation log should contain an entry
-    for every file that was moved.
+    For any two files of the same category, their operation log messages
+    should have consistent formatting and color coding.
     
-    Validates: Requirements 2.1
+    Validates: Requirements 9.2
     """
-    # Skip if any filename is invalid
-    for filename, _, _, _ in operations_data:
-        assume(is_valid_windows_name(filename))
+    # Capture console output
+    string_io = StringIO()
+    test_console = Console(file=string_io, force_terminal=True, width=120)
     
-    # Create temporary directory structure
-    with tempfile.TemporaryDirectory() as temp_dir:
-        root = Path(temp_dir)
-        src_dir = root / "source"
-        dest_dir = root / "dest"
-        src_dir.mkdir()
-        dest_dir.mkdir()
+    # Temporarily replace the global console
+    import sik_sort.operation_logger as logger_module
+    original_console = logger_module.console
+    logger_module.console = test_console
+    
+    try:
+        # Log all operations
+        for filename, category in files:
+            log_file_operation(filename, category, dry_run=False)
         
-        # Create operation log
-        log = create_operation_log(src_dir)
+        # Get the output
+        output = string_io.getvalue()
+        lines = output.strip().split('\n')
         
-        # Track all operations we perform
-        performed_operations = []
+        # Extract category markers from each line
+        category_markers = []
+        for line in lines:
+            # Look for the category marker pattern [CATEGORY]
+            if '[IMG]' in line or '[img]' in line:
+                category_markers.append('IMG')
         
-        # Simulate file movements and log them
-        for filename, extension, category, conflict_resolved in operations_data:
-            full_filename = f"{filename}.{extension}"
-            src_file = src_dir / full_filename
-            dest_file = dest_dir / category.value / full_filename
-            
-            # Create the source file
-            src_file.write_text("test content")
-            
-            # Log the operation
-            log_file_movement(log, src_file, dest_file, category, conflict_resolved)
-            
-            # Track what we logged
-            performed_operations.append({
-                'source': str(src_file),
-                'dest': str(dest_file),
-                'category': category.value,
-                'conflict': conflict_resolved
-            })
-        
-        # Finalize the log
-        finalize_log(log)
-        
-        # Verify the log file was created
-        assert log.log_path.exists(), f"Log file {log.log_path} was not created"
-        
-        # Read the log file
-        with open(log.log_path, 'r') as f:
-            log_data = json.load(f)
-        
-        # Verify all operations are in the log
-        assert len(log_data['operations']) == len(performed_operations), (
-            f"Expected {len(performed_operations)} operations in log, "
-            f"found {len(log_data['operations'])}"
+        # All lines should have the same category marker format
+        assert len(category_markers) == len(files), (
+            f"Expected {len(files)} category markers, found {len(category_markers)}"
         )
         
-        # Verify each operation is correctly recorded
-        for i, (expected, actual) in enumerate(zip(performed_operations, log_data['operations'])):
-            assert actual['source'] == expected['source'], (
-                f"Operation {i}: source mismatch - expected {expected['source']}, "
-                f"got {actual['source']}"
-            )
-            assert actual['destination'] == expected['dest'], (
-                f"Operation {i}: destination mismatch - expected {expected['dest']}, "
-                f"got {actual['destination']}"
-            )
-            assert actual['category'] == expected['category'], (
-                f"Operation {i}: category mismatch - expected {expected['category']}, "
-                f"got {actual['category']}"
-            )
-            assert actual['conflict_resolved'] == expected['conflict'], (
-                f"Operation {i}: conflict_resolved mismatch - expected {expected['conflict']}, "
-                f"got {actual['conflict_resolved']}"
-            )
+        # Check that all markers are consistent (all uppercase or all lowercase)
+        if category_markers:
+            first_marker = category_markers[0]
+            for marker in category_markers:
+                assert marker == first_marker, (
+                    f"Inconsistent category formatting: {marker} vs {first_marker}"
+                )
+    finally:
+        # Restore original console
+        logger_module.console = original_console
+
+
+# Feature: file-sorter-cli, Property 19: Error logs are visually distinct
+@settings(max_examples=100)
+@given(
+    filename=st.text(
+        min_size=1, 
+        max_size=50,
+        alphabet=st.characters(min_codepoint=32, max_codepoint=126)  # Printable ASCII only
+    ),
+    error_message=st.text(
+        min_size=1, 
+        max_size=100,
+        alphabet=st.characters(min_codepoint=32, max_codepoint=126)  # Printable ASCII only
+    ),
+    normal_filename=st.text(
+        min_size=1, 
+        max_size=50,
+        alphabet=st.characters(min_codepoint=32, max_codepoint=126)  # Printable ASCII only
+    ),
+    category=st.sampled_from([FileCategory.IMAGE, FileCategory.VIDEO, FileCategory.ARCHIVE, FileCategory.MISC])
+)
+def test_error_log_visual_distinction(filename, error_message, normal_filename, category):
+    """
+    Property 19: Error logs are visually distinct
+    
+    For any error during file operations, the error log should have
+    different styling than normal operation logs.
+    
+    Validates: Requirements 9.3
+    """
+    # Capture console output for error
+    error_io = StringIO()
+    error_console = Console(file=error_io, force_terminal=True, width=120)
+    
+    # Capture console output for normal operation
+    normal_io = StringIO()
+    normal_console = Console(file=normal_io, force_terminal=True, width=120)
+    
+    # Temporarily replace the global console
+    import sik_sort.operation_logger as logger_module
+    original_console = logger_module.console
+    
+    try:
+        # Log error
+        logger_module.console = error_console
+        log_error(filename, error_message)
+        error_output = error_io.getvalue()
         
-        # Verify timestamps are present
-        assert 'start_time' in log_data, "start_time missing from log"
-        assert 'end_time' in log_data, "end_time missing from log"
+        # Log normal operation
+        logger_module.console = normal_console
+        log_file_operation(normal_filename, category, dry_run=False)
+        normal_output = normal_io.getvalue()
         
-        # Verify all operations have timestamps
-        for i, op in enumerate(log_data['operations']):
-            assert 'timestamp' in op, f"Operation {i} missing timestamp"
+        # Verify error output contains ERROR marker
+        assert '[ERROR]' in error_output or 'ERROR' in error_output, (
+            f"Error log missing ERROR marker: {error_output}"
+        )
+        
+        # Verify normal output does NOT contain ERROR marker
+        assert '[ERROR]' not in normal_output and 'ERROR' not in normal_output, (
+            f"Normal log should not contain ERROR marker: {normal_output}"
+        )
+        
+        # Verify error output contains the filename and error message
+        assert filename in error_output, f"Filename not in error log: {error_output}"
+        assert error_message in error_output, f"Error message not in error log: {error_output}"
+    finally:
+        # Restore original console
+        logger_module.console = original_console
+
+
+# Feature: file-sorter-cli, Property 20: Scan completion displays file count
+@settings(max_examples=100)
+@given(
+    file_count=st.integers(min_value=0, max_value=10000)
+)
+def test_scan_completion_displays_count(file_count):
+    """
+    Property 20: Scan completion displays file count
+    
+    For any directory scan operation, after completion, the displayed
+    message should contain the total number of files found.
+    
+    Validates: Requirements 9.4
+    """
+    # Capture console output
+    string_io = StringIO()
+    test_console = Console(file=string_io, force_terminal=True, width=120)
+    
+    # Temporarily replace the global console
+    import sik_sort.operation_logger as logger_module
+    original_console = logger_module.console
+    logger_module.console = test_console
+    
+    try:
+        # Log scan completion
+        log_scan_complete(file_count)
+        
+        # Get the output
+        output = string_io.getvalue()
+        
+        # Verify the file count is in the output
+        assert str(file_count) in output, (
+            f"File count {file_count} not found in scan completion log: {output}"
+        )
+        
+        # Verify it mentions "file" or "files"
+        assert 'file' in output.lower(), (
+            f"Scan completion log should mention 'file': {output}"
+        )
+    finally:
+        # Restore original console
+        logger_module.console = original_console

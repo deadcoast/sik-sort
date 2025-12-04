@@ -6,6 +6,7 @@ from typing import Callable
 import shutil
 from .classifier import FileCategory, classify_file
 from .scanner import scan_directory
+from .operation_logger import log_file_operation
 
 
 @dataclass
@@ -116,12 +117,14 @@ class EnhancedSortingStats:
             return f"{size:.2f} {units[unit_index]}"
 
 
-def sort_files(source_path: Path, progress_callback: Callable) -> SortingStats:
+def sort_files(source_path: Path, dry_run: bool = False, progress_callback: Callable = None, ascii_progress_callback: Callable = None) -> SortingStats:
     """Main sorting orchestrator.
     
     Args:
         source_path: Root directory to sort files from
-        progress_callback: Callback function for progress updates
+        dry_run: If True, simulate operations without modifying files
+        progress_callback: Callback function for progress updates (Rich progress)
+        ascii_progress_callback: Callback function for ASCII progress bar updates
         
     Returns:
         SortingStats: Statistics about the sorting operation
@@ -135,35 +138,47 @@ def sort_files(source_path: Path, progress_callback: Callable) -> SortingStats:
     files = scan_directory(source_path, exclude_dirs)
     
     # Process each file
-    for file_path in files:
+    for i, file_path in enumerate(files, 1):
         # Classify the file
         category = classify_file(file_path)
         
+        # Log the operation
+        log_file_operation(file_path.name, category, dry_run=dry_run)
+        
         # Determine destination folder
         dest_folder = source_path / category.value
-        dest_folder.mkdir(exist_ok=True)
+        if not dry_run:
+            dest_folder.mkdir(exist_ok=True)
         
         # Move file with conflict resolution
         dest_path = dest_folder / file_path.name
-        move_file_with_conflict_resolution(file_path, dest_path)
+        move_file_with_conflict_resolution(file_path, dest_path, dry_run=dry_run)
         
         # Update statistics
         stats.increment(category)
         
-        # Call progress callback
+        # Call progress callbacks
         if progress_callback:
             progress_callback()
+        
+        if ascii_progress_callback:
+            ascii_progress_callback(i, len(files))
     
     return stats
 
 
-def move_file_with_conflict_resolution(src: Path, dest: Path) -> None:
+def move_file_with_conflict_resolution(src: Path, dest: Path, dry_run: bool = False) -> None:
     """Moves file and handles naming conflicts.
     
     Args:
         src: Source file path
         dest: Destination file path
+        dry_run: If True, simulate the move without actually moving files
     """
+    if dry_run:
+        # In dry-run mode, don't actually move files
+        return
+    
     # If destination doesn't exist, move directly
     if not dest.exists():
         shutil.move(str(src), str(dest))

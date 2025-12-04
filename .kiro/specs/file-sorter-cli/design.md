@@ -41,16 +41,19 @@ The application follows a modular architecture with three main layers:
 
 **Responsibilities:**
 - Display prompts and collect user input
-- Show progress during file operations
+- Show progress during file operations with ASCII progress bars
 - Display statistics in formatted tables
 - Handle yes/no confirmations
+- Parse command-line arguments for path and flags
 
 **Key Functions:**
+- `parse_arguments() -> tuple[Path | None, bool]`: Parses command-line arguments for path and dry-run flag
 - `prompt_for_path() -> Path`: Prompts user for source directory path with validation
-- `display_statistics(stats: SortingStats) -> None`: Shows sorting results using Rich tables
+- `display_statistics(stats: SortingStats, dry_run: bool) -> None`: Shows sorting results using Rich tables
 - `confirm_cleanup() -> bool`: Prompts user for empty folder cleanup confirmation
-- `show_progress(total: int) -> Progress`: Creates Rich progress bar for file operations
+- `display_ascii_progress(current: int, total: int) -> None`: Shows ASCII progress bar with █ and ░ characters
 - `display_error(message: str) -> None`: Shows formatted error messages
+- `display_dry_run_banner() -> None`: Shows prominent banner indicating dry-run mode
 
 ### 2. File Classifier (`classifier.py`)
 
@@ -77,10 +80,11 @@ class FileCategory(Enum):
 - Coordinate the sorting process
 - Track statistics
 - Handle file name conflicts
+- Log operations in real-time
 
 **Key Functions:**
-- `sort_files(source_path: Path, progress_callback: Callable) -> SortingStats`: Main sorting orchestrator
-- `move_file_with_conflict_resolution(src: Path, dest: Path) -> None`: Moves file and handles naming conflicts
+- `sort_files(source_path: Path, dry_run: bool, progress_callback: Callable, log_callback: Callable) -> SortingStats`: Main sorting orchestrator
+- `move_file_with_conflict_resolution(src: Path, dest: Path, dry_run: bool) -> None`: Moves file and handles naming conflicts (or simulates in dry-run)
 - `generate_unique_filename(dest_path: Path, filename: str) -> str`: Creates unique filename when conflicts occur
 
 **Data Types:**
@@ -115,16 +119,30 @@ class SortingStats:
 - `find_empty_directories(root_path: Path, preserve_dirs: set[str]) -> list[Path]`: Finds all empty directories
 - `remove_empty_directories(directories: list[Path]) -> int`: Removes empty folders and returns count
 
-### 6. Main Entry Point (`main.py`)
+### 6. Operation Logger (`operation_logger.py`)
+
+**Responsibilities:**
+- Display real-time operation logs during sorting
+- Provide color-coded, stylized output for different operations
+- Show file movements with source and destination
+
+**Key Functions:**
+- `log_file_operation(filename: str, category: FileCategory, dry_run: bool) -> None`: Logs a file being moved to a category
+- `log_scan_complete(file_count: int) -> None`: Logs completion of directory scan
+- `log_conflict_resolution(original_name: str, new_name: str) -> None`: Logs when a filename conflict is resolved
+- `log_error(filename: str, error_message: str) -> None`: Logs errors during file operations
+
+### 7. Main Entry Point (`main.py`)
 
 **Responsibilities:**
 - Application entry point
 - Orchestrate the overall workflow
 - Handle top-level error handling
+- Coordinate dry-run vs normal execution modes
 
 **Key Functions:**
-- `main() -> None`: Main application flow
-- `setup_category_folders(source_path: Path) -> None`: Creates target category folders
+- `main() -> None`: Main application flow with argument parsing and mode selection
+- `setup_category_folders(source_path: Path, dry_run: bool) -> None`: Creates target category folders (or simulates in dry-run)
 
 ## Data Models
 
@@ -230,6 +248,74 @@ EXTENSION_MAP = {
 *For any* set of files with identical names being moved to the same destination, each file should receive a unique final name
 **Validates: Requirements 7.3**
 
+### Property 17: Operation logs display file and category
+*For any* file being processed, the operation log should contain both the filename and the destination category
+**Validates: Requirements 9.1**
+
+### Property 18: Consistent category formatting
+*For any* two files of the same category, their operation log messages should have consistent formatting and color coding
+**Validates: Requirements 9.2**
+
+### Property 19: Error logs are visually distinct
+*For any* error during file operations, the error log should have different styling than normal operation logs
+**Validates: Requirements 9.3**
+
+### Property 20: Scan completion displays file count
+*For any* directory scan operation, after completion, the displayed message should contain the total number of files found
+**Validates: Requirements 9.4**
+
+### Property 21: Progress bar uses ASCII block characters
+*For any* progress bar display, the output should contain the block characters █ and ░
+**Validates: Requirements 10.1**
+
+### Property 22: Progress percentage increases monotonically
+*For any* sequence of file processing operations, the progress percentage should never decrease
+**Validates: Requirements 10.2**
+
+### Property 23: Progress bar includes percentage value
+*For any* progress bar display, the output should contain a numeric percentage value
+**Validates: Requirements 10.3**
+
+### Property 24: Progress completes at 100%
+*For any* sorting operation, after all files are processed, the progress bar should show 100% before statistics are displayed
+**Validates: Requirements 10.4**
+
+### Property 25: Dry-run preserves file system
+*For any* directory, running in dry-run mode should result in no files being moved or modified
+**Validates: Requirements 11.1**
+
+### Property 26: Dry-run displays operation logs
+*For any* file that would be moved in normal mode, dry-run mode should display an operation log for that file
+**Validates: Requirements 11.2**
+
+### Property 27: Dry-run displays accurate statistics
+*For any* directory, the statistics displayed in dry-run mode should match what would have been moved in normal mode
+**Validates: Requirements 11.3**
+
+### Property 28: Dry-run mode is clearly indicated
+*For any* dry-run execution, the output should contain clear indicators at the start and end that no changes were made
+**Validates: Requirements 11.4**
+
+### Property 29: Dry-run skips cleanup prompt
+*For any* dry-run execution, the cleanup prompt should not be displayed
+**Validates: Requirements 11.5**
+
+### Property 30: Command-line path argument is used
+*For any* valid path provided as a command-line argument, that path should be used as the source directory without prompting
+**Validates: Requirements 12.1**
+
+### Property 31: Missing path triggers interactive prompt
+*For any* invocation without a path argument, an interactive prompt should be displayed
+**Validates: Requirements 12.2**
+
+### Property 32: Dry-run flag works with path argument
+*For any* valid path, invoking with both the path and dry-run flag should perform a dry-run on that path
+**Validates: Requirements 12.3**
+
+### Property 33: Invalid command-line path shows error
+*For any* invalid path provided as a command-line argument, an error message should be displayed and the program should exit
+**Validates: Requirements 12.4**
+
 ## Error Handling
 
 ### Path Validation Errors
@@ -298,12 +384,44 @@ Integration tests will verify end-to-end workflows:
 - Use batch operations where possible to minimize file system calls
 - Display progress for large directories to provide user feedback
 - Consider memory usage when scanning very large directory structures
+- Update progress bar efficiently without excessive terminal redraws
 
 ### Rich Library Integration
 - Use `rich.prompt.Prompt` for user input
-- Use `rich.progress.Progress` for file operation progress bars
-- Use `rich.table.Table` for statistics display
 - Use `rich.console.Console` for all output with appropriate styling
+- Use `rich.table.Table` for statistics display
+- Use `rich.panel.Panel` for dry-run mode banners
+- Use color coding: green for images, blue for videos, yellow for archives, white for misc
+- Use red/bold styling for errors
+
+### ASCII Progress Bar Implementation
+- Format: `[██████████░░░░░░░░░░] 50%`
+- Use █ (U+2588) for completed portions
+- Use ░ (U+2591) for remaining portions
+- Update in-place using carriage return (`\r`) for smooth animation
+- Bar width should be fixed (e.g., 20 characters) with percentage displayed after
+
+### Command-Line Interface
+- Use `argparse` or `click` for argument parsing
+- Support positional path argument: `sik sort <path>`
+- Support `--dry` or `--dry-run` flag for simulation mode
+- Provide `--help` for usage information
+
+### Dry-Run Mode Implementation
+- Set a global or passed flag to indicate dry-run mode
+- Skip all file system modification operations (move, delete)
+- Log all operations that would be performed
+- Display prominent banner at start: "DRY RUN MODE - No files will be modified"
+- Display confirmation at end: "DRY RUN COMPLETE - No changes were made"
+- Skip cleanup prompt entirely in dry-run mode
+
+### Operation Logging Strategy
+- Log each file operation as it happens (not batched)
+- Format: `[CATEGORY] filename.ext → /path/to/category/folder`
+- Use category-specific colors for visual distinction
+- Log conflicts: `[CONFLICT] filename.ext → filename_1.ext`
+- Log errors with red styling and error icon
+- Display scan summary before sorting begins
 
 ### File Conflict Resolution Strategy
 Append a numeric suffix before the extension: `filename_1.ext`, `filename_2.ext`, etc.

@@ -16,6 +16,9 @@ Sik Sort is a command-line utility for Windows that organizes files from a speci
 - **msk**: Target folder for miscellaneous files that don't fit other categories
 - **Recursive Processing**: Processing files in the source directory and all its subdirectories
 - **Empty Folder Cleanup**: Removal of directories that contain no files after sorting
+- **Dry Run**: A simulation mode where Sik Sort shows what operations would be performed without actually moving or modifying files
+- **Operation Log**: Real-time display of file operations being performed during sorting
+- **ASCII Progress Bar**: A text-based progress indicator using block characters (█ and ░) to show completion percentage
 
 ## Requirements
 
@@ -103,3 +106,48 @@ Sik Sort is a command-line utility for Windows that organizes files from a speci
 1. WHEN Sik Sort displays prompts THEN Sik Sort SHALL use Rich library components for formatted output
 2. WHEN Sik Sort displays progress or status information THEN Sik Sort SHALL use Rich library features for visual feedback
 3. WHEN Sik Sort displays errors THEN Sik Sort SHALL use Rich library styling to make errors clearly visible
+
+### Requirement 9
+
+**User Story:** As a user, I want to see real-time operation logs during sorting, so that I can monitor what the system is actively doing.
+
+#### Acceptance Criteria
+
+1. WHEN Sik Sort processes each file THEN Sik Sort SHALL display a stylized log message showing the file being moved and its destination category
+2. WHEN Sik Sort displays operation logs THEN Sik Sort SHALL use consistent formatting with color coding for different categories
+3. WHEN Sik Sort encounters an error during file operations THEN Sik Sort SHALL log the error with clear visual distinction
+4. WHEN Sik Sort completes scanning THEN Sik Sort SHALL display the total number of files found before beginning the sorting operation
+
+### Requirement 10
+
+**User Story:** As a user, I want to see an ASCII progress bar during sorting operations, so that I can track completion status visually.
+
+#### Acceptance Criteria
+
+1. WHEN Sik Sort begins sorting files THEN Sik Sort SHALL display an ASCII progress bar using block characters (█ for completed, ░ for remaining)
+2. WHEN Sik Sort processes files THEN Sik Sort SHALL update the progress bar in real-time to reflect current completion percentage
+3. WHEN Sik Sort displays the progress bar THEN Sik Sort SHALL show the percentage value alongside the visual bar
+4. WHEN Sik Sort completes sorting THEN Sik Sort SHALL show the progress bar at one hundred percent before displaying final statistics
+
+### Requirement 11
+
+**User Story:** As a user, I want to run the sort command with a dry-run option, so that I can preview what changes would be made without actually modifying files.
+
+#### Acceptance Criteria
+
+1. WHEN the user invokes Sik Sort with the dry run flag THEN Sik Sort SHALL simulate all operations without moving or modifying any files
+2. WHEN Sik Sort runs in dry run mode THEN Sik Sort SHALL display all operation logs showing what would be done
+3. WHEN Sik Sort runs in dry run mode THEN Sik Sort SHALL display statistics showing what would have been moved
+4. WHEN Sik Sort runs in dry run mode THEN Sik Sort SHALL clearly indicate at the start and end that no actual changes were made
+5. WHEN Sik Sort runs in dry run mode THEN Sik Sort SHALL skip the empty folder cleanup prompt
+
+### Requirement 12
+
+**User Story:** As a user, I want to invoke the sort command directly with a path argument, so that I can sort directories efficiently without interactive prompts.
+
+#### Acceptance Criteria
+
+1. WHEN the user invokes the sik command with a path argument THEN Sik Sort SHALL use the provided path as the source directory
+2. WHEN the user invokes the sik command without a path argument THEN Sik Sort SHALL prompt for the path interactively
+3. WHEN the user invokes the sik command with the dry run flag and a path THEN Sik Sort SHALL perform a dry run on the specified path
+4. WHEN the user provides an invalid path as a command argument THEN Sik Sort SHALL display an error message and exit

@@ -31,13 +31,15 @@ def prompt_for_path() -> Path:
         return path
 
 
-def display_statistics(stats) -> None:
+def display_statistics(stats, dry_run: bool = False) -> None:
     """Show sorting results using Rich tables.
     
     Args:
         stats: SortingStats object containing file counts
+        dry_run: If True, indicate these are simulated statistics
     """
-    table = Table(title="Sorting Statistics", show_header=True, header_style="bold magenta")
+    title = "Sorting Statistics (DRY RUN)" if dry_run else "Sorting Statistics"
+    table = Table(title=title, show_header=True, header_style="bold magenta")
     table.add_column("Category", style="cyan", justify="left")
     table.add_column("Count", style="green", justify="right")
     
@@ -116,3 +118,37 @@ def display_safety_warnings(warnings: list[str]) -> bool:
         "[bold red]Are you ABSOLUTELY SURE you want to proceed?[/bold red]",
         default=False
     )
+
+
+def display_ascii_progress(current: int, total: int) -> None:
+    """Shows ASCII progress bar with █ and ░ characters.
+    
+    Args:
+        current: Current number of items processed
+        total: Total number of items to process
+    """
+    if total == 0:
+        percentage = 100
+    else:
+        percentage = int((current / total) * 100)
+    
+    # Fixed bar width of 20 characters
+    bar_width = 20
+    filled = int((current / total) * bar_width) if total > 0 else bar_width
+    empty = bar_width - filled
+    
+    # Build the progress bar
+    bar = '█' * filled + '░' * empty
+    
+    # Print with carriage return for in-place update
+    print(f'\r[{bar}] {percentage}%', end='', flush=True)
+
+
+def display_dry_run_banner() -> None:
+    """Show prominent banner indicating dry-run mode."""
+    console.print()
+    console.print("[bold yellow]" + "=" * 60 + "[/bold yellow]")
+    console.print("[bold yellow]                    DRY RUN MODE                           [/bold yellow]")
+    console.print("[bold yellow]           No files will be modified                       [/bold yellow]")
+    console.print("[bold yellow]" + "=" * 60 + "[/bold yellow]")
+    console.print()

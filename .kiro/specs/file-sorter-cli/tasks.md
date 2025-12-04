@@ -209,3 +209,197 @@
 
 
   - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 11. Implement operation logger module
+
+
+
+
+
+
+
+
+
+  - Create operation_logger.py with color-coded logging functions
+  - Implement log_file_operation() with category-specific colors (green for images, blue for videos, yellow for archives, white for misc)
+  - Implement log_scan_complete() to display file count after scanning
+  - Implement log_conflict_resolution() for filename conflicts
+  - Implement log_error() with red/bold styling for errors
+  - Use Rich Console for all log output
+  - _Requirements: 9.1, 9.2, 9.3, 9.4_
+
+- [x] 11.1 Write property test for operation log contains filename and category
+
+
+  - **Property 17: Operation logs display file and category**
+  - **Validates: Requirements 9.1**
+
+- [x] 11.2 Write property test for consistent category formatting
+
+
+  - **Property 18: Consistent category formatting**
+  - **Validates: Requirements 9.2**
+
+- [x] 11.3 Write property test for error log visual distinction
+
+
+  - **Property 19: Error logs are visually distinct**
+  - **Validates: Requirements 9.3**
+
+- [x] 11.4 Write property test for scan completion displays count
+
+
+  - **Property 20: Scan completion displays file count**
+  - **Validates: Requirements 9.4**
+
+- [x] 12. Implement ASCII progress bar functionality
+
+
+
+
+
+
+
+
+
+  - Add display_ascii_progress() function to cli.py
+  - Use █ (U+2588) for completed portions and ░ (U+2591) for remaining
+  - Format as `[██████████░░░░░░░░░░] 50%` with fixed 20-character bar width
+  - Update progress in-place using carriage return for smooth animation
+  - Integrate progress bar updates into file sorting loop
+  - _Requirements: 10.1, 10.2, 10.3, 10.4_
+
+- [x] 12.1 Write property test for progress bar uses ASCII characters
+
+
+  - **Property 21: Progress bar uses ASCII block characters**
+  - **Validates: Requirements 10.1**
+
+- [x] 12.2 Write property test for progress percentage monotonicity
+
+  - **Property 22: Progress percentage increases monotonically**
+  - **Validates: Requirements 10.2**
+
+- [x] 12.3 Write property test for progress bar includes percentage
+
+  - **Property 23: Progress bar includes percentage value**
+  - **Validates: Requirements 10.3**
+
+- [x] 12.4 Write property test for progress completes at 100%
+
+  - **Property 24: Progress completes at 100%**
+  - **Validates: Requirements 10.4**
+
+- [x] 13. Implement dry-run mode
+
+
+
+
+
+
+
+
+
+  - Add dry_run parameter to sort_files(), move_file_with_conflict_resolution(), and setup_category_folders()
+  - Modify file operations to skip actual moves when dry_run=True
+  - Create display_dry_run_banner() in cli.py to show prominent start/end banners
+  - Update operation logger to indicate simulated operations in dry-run mode
+  - Skip cleanup prompt when in dry-run mode
+  - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
+
+- [x] 13.1 Write property test for dry-run preserves file system
+
+
+  - **Property 25: Dry-run preserves file system**
+  - **Validates: Requirements 11.1**
+
+- [x] 13.2 Write property test for dry-run displays operation logs
+
+
+  - **Property 26: Dry-run displays operation logs**
+  - **Validates: Requirements 11.2**
+
+- [x] 13.3 Write property test for dry-run statistics accuracy
+
+
+  - **Property 27: Dry-run displays accurate statistics**
+  - **Validates: Requirements 11.3**
+
+- [x] 13.4 Write property test for dry-run mode indicators
+
+
+  - **Property 28: Dry-run mode is clearly indicated**
+  - **Validates: Requirements 11.4**
+
+- [x] 13.5 Write property test for dry-run skips cleanup
+
+
+  - **Property 29: Dry-run skips cleanup prompt**
+  - **Validates: Requirements 11.5**
+
+- [-] 14. Implement command-line argument parsing
+
+
+
+
+
+
+  - Add parse_arguments() function to cli.py using argparse
+  - Support positional path argument: `sik sort <path>`
+  - Support `--dry` flag for dry-run mode
+  - Add `--help` for usage information
+  - Update main() to use parsed arguments instead of always prompting
+  - Validate command-line path and show error if invalid
+  - Fall back to interactive prompt if no path provided
+  - _Requirements: 12.1, 12.2, 12.3, 12.4_
+
+- [ ] 14.1 Write property test for command-line path is used
+  - **Property 30: Command-line path argument is used**
+  - **Validates: Requirements 12.1**
+
+- [ ] 14.2 Write property test for missing path triggers prompt
+  - **Property 31: Missing path triggers interactive prompt**
+  - **Validates: Requirements 12.2**
+
+- [ ] 14.3 Write property test for dry-run with path argument
+  - **Property 32: Dry-run flag works with path argument**
+  - **Validates: Requirements 12.3**
+
+- [ ] 14.4 Write property test for invalid command-line path error
+  - **Property 33: Invalid command-line path shows error**
+  - **Validates: Requirements 12.4**
+
+- [ ] 15. Integrate all new features into main workflow
+
+
+
+
+  - Update main() to parse arguments and determine dry-run mode
+  - Integrate operation logger calls throughout sorting process
+  - Add ASCII progress bar updates during file processing
+  - Display dry-run banners when appropriate
+  - Update statistics display to indicate dry-run mode
+  - Ensure all components work together seamlessly
+  - _Requirements: 9.1, 9.2, 9.3, 9.4, 10.1, 10.2, 10.3, 10.4, 11.1, 11.2, 11.3, 11.4, 11.5, 12.1, 12.2, 12.3, 12.4_
+
+- [ ] 16. Update README and documentation
+
+
+
+
+  - Add documentation for new `sik sort <path>` command syntax
+  - Document `--dry` flag usage and behavior
+  - Add examples showing operation logs and progress bars
+  - Update installation instructions if needed
+  - _Requirements: All new requirements_
+
+- [ ] 17. Final checkpoint - Ensure all tests pass
+
+
+
+
+  - Run all tests including new property tests
+  - Verify dry-run mode works correctly
+  - Test command-line argument parsing
+  - Ensure operation logs and progress bars display correctly
+  - Ensure all tests pass, ask the user if questions arise.
